@@ -12,18 +12,20 @@ type AuthPayload struct {
 
 func Login (w http.ResponseWriter, r *http.Request) {
 	var loginPayload AuthPayload
-
-	if (json.NewDecoder(r.Body).Decode(&loginPayload) != nil){
+	err := json.NewDecoder(r.Body).Decode(&loginPayload)
+	if (err != nil){
 		http.Error(w, "Invalid JSON Body", http.StatusBadRequest)
+		return
 	}
 	w.WriteHeader(http.StatusOK)
 }
 
 func Register (w http.ResponseWriter, r *http.Request){
 	var registerPayload AuthPayload
-
-	if (json.NewDecoder(r.Body).Decode(&registerPayload) != nil){
+	err := json.NewDecoder(r.Body).Decode(&registerPayload)
+	if (err != nil){
 		http.Error(w, "Invalid JSON Body", http.StatusBadRequest)
+		return
 	}
 	w.WriteHeader(http.StatusCreated)
 }
