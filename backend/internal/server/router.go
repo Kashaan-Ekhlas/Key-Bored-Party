@@ -1,8 +1,8 @@
-package internal
+package server
 
 import (
-	"github.com/Kashaan-Ekhlas/Backend_GO/internal/auth"
-	"github.com/Kashaan-Ekhlas/Backend_GO/pkg/utils"
+	"github.com/Kashaan-Ekhlas/Key-Bored-Party/backend/internal/auth"
+	"github.com/Kashaan-Ekhlas/Key-Bored-Party/backend/internal/health"
 	"net/http"
 )
 
@@ -17,7 +17,7 @@ func NewRouter() *http.ServeMux {
 	mux.HandleFunc("POST /auth/register", auth.Register)
 
 	// Health Route(s?)
-	mux.HandleFunc("GET /health", utils.HealthCheck)
+	mux.HandleFunc("GET /health", health.HealthCheck)
 
 	return mux
 }

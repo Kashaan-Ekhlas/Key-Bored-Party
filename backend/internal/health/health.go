@@ -1,4 +1,4 @@
-package utils
+package health
 
 import (
 	"encoding/json"

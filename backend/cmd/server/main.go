@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/Kashaan-Ekhlas/Backend_GO/internal"
+	"github.com/Kashaan-Ekhlas/Key-Bored-Party/backend/internal/server"
 	"log"
 	"net/http"
 )
 
 func main() {
-	mux := internal.NewRouter()
+	mux := server.NewRouter()
 
 	server := &http.Server{
 		Addr:    ":5005",
