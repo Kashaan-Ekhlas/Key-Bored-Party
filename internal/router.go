@@ -1,9 +1,9 @@
 package internal
 
 import (
-	"net/http"
 	"github.com/Kashaan-Ekhlas/Backend_GO/internal/auth"
 	"github.com/Kashaan-Ekhlas/Backend_GO/pkg/utils"
+	"net/http"
 )
 
 func NewRouter() *http.ServeMux {
@@ -22,8 +22,7 @@ func NewRouter() *http.ServeMux {
 	return mux
 }
 
-func Root (w http.ResponseWriter, r *http.Request){
+func Root(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Welcome to Key Bored Party\n"))
 }
-

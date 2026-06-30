@@ -1,16 +1,16 @@
 package main
 
 import (
+	"github.com/Kashaan-Ekhlas/Backend_GO/internal"
 	"log"
 	"net/http"
-	"github.com/Kashaan-Ekhlas/Backend_GO/internal"
 )
 
-func main(){
-  mux := internal.NewRouter()
+func main() {
+	mux := internal.NewRouter()
 
-	server:= &http.Server{
-		Addr: ":5005",
+	server := &http.Server{
+		Addr:    ":5005",
 		Handler: mux,
 	}
 
