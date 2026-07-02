@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/mail"
+	"strings"
 )
 
 type AuthPayload struct {
@@ -18,6 +20,18 @@ func hashPassword(password string) (string, error) {
 }
 
 func emailFormatCheck(email string) error {
+	if strings.Contains(email, " ") {
+		return errors.New("invalid email format")
+	}
+
+	addr, err := mail.ParseAddress(email)
+	if err != nil {
+		return errors.New("invalid email format")
+	}
+
+	if addr.Address != email {
+		return errors.New("invalid email format")
+	}
 	return nil
 }
 
@@ -33,16 +47,19 @@ func validatePayload(body io.ReadCloser) (AuthPayload, error) {
 		return authPayload, err
 	}
 
+	authPayload.Email = strings.TrimSpace(authPayload.Email)
+	authPayload.Password = strings.TrimSpace(authPayload.Password)
+
 	if authPayload.Email == "" || authPayload.Password == "" {
-		return authPayload, errors.New("Email or Password Empty")
+		return authPayload, errors.New("email or password empty")
 	}
 
 	if len(authPayload.Email) > 254 {
-		return authPayload, errors.New("Email too large")
+		return authPayload, errors.New("email too large")
 	}
 
 	if len(authPayload.Password) > 128 {
-		return authPayload, errors.New("Password too large")
+		return authPayload, errors.New("password too large")
 	}
 
 	if err := emailFormatCheck(authPayload.Email); err != nil {
@@ -61,13 +78,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	loginPayload, err := validatePayload(r.Body)
 	if err != nil {
-		http.Error(w, "Invalid Email or Password", http.StatusBadRequest)
+		http.Error(w, "invalid email or password", http.StatusBadRequest)
 		return
 	}
 
 	loginPayload.Password, err = hashPassword(loginPayload.Password)
 	if err != nil {
-		log.Println("Hash Function Failure")
+		log.Println("hash function failure")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -80,24 +97,24 @@ func Login(w http.ResponseWriter, r *http.Request) {
 func Register(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 8<<10)
 	if r.ContentLength > 8<<10 {
-		http.Error(w, "Request Too Large", http.StatusRequestEntityTooLarge)
+		http.Error(w, "request too large", http.StatusRequestEntityTooLarge)
 		return
 	}
 
 	registerPayload, err := validatePayload(r.Body)
 	if err != nil {
-		http.Error(w, "Invalid Email or Password", http.StatusBadRequest)
+		http.Error(w, "invalid email or password", http.StatusBadRequest)
 		return
 	}
 
 	if err := passwordFormatCheck(registerPayload.Password); err != nil {
-		http.Error(w, "Invalid Email or Password", http.StatusBadRequest)
+		http.Error(w, "invalid email or password", http.StatusBadRequest)
 		return
 	}
 
 	registerPayload.Password, err = hashPassword(registerPayload.Password)
 	if err != nil {
-		log.Println("Hash Function Failure")
+		log.Println("hash function failure")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
