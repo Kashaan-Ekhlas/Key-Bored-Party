@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"errors"
+	zxcvbn "github.com/nbutton23/zxcvbn-go"
 	"io"
 	"log"
 	"net/http"
@@ -35,7 +36,15 @@ func emailFormatCheck(email string) error {
 	return nil
 }
 
-func passwordFormatCheck(password string) error {
+func passwordStrengthCheck(registerPayload AuthPayload) error {
+	if len(registerPayload.Password) < 8 {
+		return errors.New("password must be at least 8 characters")
+	}
+
+	strength := zxcvbn.PasswordStrength(registerPayload.Password, []string{registerPayload.Email})
+	if strength.Score < 3 {
+		return errors.New("weak password")
+	}
 	return nil
 }
 
@@ -44,7 +53,7 @@ func validatePayload(body io.ReadCloser) (AuthPayload, error) {
 
 	decoder := json.NewDecoder(body)
 
-	if err := json.NewDecoder(body).Decode(&authPayload); err != nil {
+	if err := decoder.Decode(&authPayload); err != nil {
 		return authPayload, err
 	}
 
@@ -112,8 +121,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := passwordFormatCheck(registerPayload.Password); err != nil {
-		http.Error(w, "invalid email or password", http.StatusBadRequest)
+	if err := passwordStrengthCheck(registerPayload); err != nil {
+		http.Error(w, "weak password", http.StatusBadRequest)
 		return
 	}
 
