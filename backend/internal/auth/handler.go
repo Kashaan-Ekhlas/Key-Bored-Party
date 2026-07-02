@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"errors"
+	"github.com/alexedwards/argon2id"
 	zxcvbn "github.com/nbutton23/zxcvbn-go"
 	"io"
 	"log"
@@ -14,10 +15,6 @@ import (
 type AuthPayload struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
-}
-
-func hashPassword(password string) (string, error) {
-	return "dummy string", nil
 }
 
 func emailFormatCheck(email string) error {
@@ -96,14 +93,20 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	loginPayload.Password, err = hashPassword(loginPayload.Password)
+	// to do: check email existence
+	// to do: retrieve hashedpassword for comparison if email exists, use dummy hash if not
+
+	mockHash := "$argon2id$v=19$m=65536,t=3,p=2$c29tZXNhbHQ$RdescudvJCsgt3ub+b+dWRWJTmaaJObG"
+	match, err := argon2id.ComparePasswordAndHash(loginPayload.Password, mockHash)
 	if err != nil {
 		log.Println("hash function failure")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	// CompareHash()
+	if !match {
+		http.Error(w, "invalid email or password", http.StatusBadRequest)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -126,14 +129,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	registerPayload.Password, err = hashPassword(registerPayload.Password)
+	registerPayload.Password, err = argon2id.CreateHash(registerPayload.Password, argon2id.DefaultParams)
 	if err != nil {
 		log.Println("hash function failure")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// createAccount()
+	// todo: createAccount()
 
 	w.WriteHeader(http.StatusCreated)
 }
