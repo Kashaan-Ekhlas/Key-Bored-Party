@@ -39,7 +39,7 @@ func passwordStrengthCheck(registerPayload AuthPayload) error {
 	}
 
 	strength := zxcvbn.PasswordStrength(registerPayload.Password, []string{registerPayload.Email})
-	if strength.Score < 3 {
+	if strength.Score < 2 {
 		return errors.New("weak password")
 	}
 	return nil
@@ -49,6 +49,7 @@ func validatePayload(body io.ReadCloser) (AuthPayload, error) {
 	var authPayload AuthPayload
 
 	decoder := json.NewDecoder(body)
+	decoder.DisallowUnknownFields()
 
 	if err := decoder.Decode(&authPayload); err != nil {
 		return authPayload, err
@@ -82,10 +83,6 @@ func validatePayload(body io.ReadCloser) (AuthPayload, error) {
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 8<<10)
-	if r.ContentLength > 8<<10 {
-		http.Error(w, "request too large", http.StatusRequestEntityTooLarge)
-		return
-	}
 
 	loginPayload, err := validatePayload(r.Body)
 	if err != nil {
@@ -113,10 +110,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 func Register(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 8<<10)
-	if r.ContentLength > 8<<10 {
-		http.Error(w, "request too large", http.StatusRequestEntityTooLarge)
-		return
-	}
 
 	registerPayload, err := validatePayload(r.Body)
 	if err != nil {
