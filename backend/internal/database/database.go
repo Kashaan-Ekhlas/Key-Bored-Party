@@ -2,21 +2,13 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"github.com/Kashaan-Ekhlas/Key-Bored-Party/backend/internal/config"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func NewPool(cfg *config.Config) (*pgxpool.Pool, error) {
-	connectionString := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s",
-		cfg.DBUser,
-		cfg.DBPassword,
-		cfg.DBHost,
-		cfg.DBPort,
-		cfg.DBName)
 
-	poolConfig, err := pgxpool.ParseConfig(connectionString)
+	poolConfig, err := pgxpool.ParseConfig(cfg.DatabaseURL())
 	if err != nil {
 		return nil, err
 	}

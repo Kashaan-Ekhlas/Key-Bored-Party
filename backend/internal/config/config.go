@@ -1,9 +1,9 @@
 package config
 
 import (
-	"os"
-
+	"fmt"
 	"github.com/joho/godotenv"
+	"os"
 )
 
 type Config struct {
@@ -13,6 +13,18 @@ type Config struct {
 	DBUser     string
 	DBPassword string
 	DBName     string
+}
+
+func (cfg *Config) DatabaseURL() string {
+	connectionString := fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		cfg.DBUser,
+		cfg.DBPassword,
+		cfg.DBHost,
+		cfg.DBPort,
+		cfg.DBName,
+	)
+	return connectionString
 }
 
 func Load() (*Config, error) {
