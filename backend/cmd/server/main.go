@@ -1,16 +1,23 @@
 package main
 
 import (
-	"github.com/Kashaan-Ekhlas/Key-Bored-Party/backend/internal/server"
 	"log"
 	"net/http"
+
+	"github.com/Kashaan-Ekhlas/Key-Bored-Party/backend/internal/config"
+	"github.com/Kashaan-Ekhlas/Key-Bored-Party/backend/internal/server"
 )
 
 func main() {
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	mux := server.NewRouter()
 
 	server := &http.Server{
-		Addr:    ":5005",
+		Addr:    ":" + cfg.AppPort,
 		Handler: mux,
 	}
 

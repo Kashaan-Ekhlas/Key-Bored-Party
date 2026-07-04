@@ -1,4 +1,5 @@
-main
 backend/names.txt
-.env
+backend/.env
+backend/main
+
 frontend/node_modules
