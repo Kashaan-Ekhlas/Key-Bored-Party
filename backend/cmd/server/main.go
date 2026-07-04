@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/Kashaan-Ekhlas/Key-Bored-Party/backend/internal/config"
+	"github.com/Kashaan-Ekhlas/Key-Bored-Party/backend/internal/database"
+	"github.com/Kashaan-Ekhlas/Key-Bored-Party/backend/internal/server"
 	"log"
 	"net/http"
-
-	"github.com/Kashaan-Ekhlas/Key-Bored-Party/backend/internal/config"
-	"github.com/Kashaan-Ekhlas/Key-Bored-Party/backend/internal/server"
 )
 
 func main() {
@@ -13,6 +13,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	pool, err := database.NewPool(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer pool.Close()
 
 	mux := server.NewRouter()
 
